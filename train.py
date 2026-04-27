@@ -74,18 +74,10 @@ def plot_history(history):
     plt.legend()
     plt.tight_layout()
     plt.show()
-# ==========================================
-# 主程序：大满贯版 (一次性生成 3 个实验的所有图表)
-# ==========================================
 if __name__ == '__main__':
-    # 1. 加载数据
     X_train, y_train, X_val, y_val, X_test, y_test = load_fashion_mnist()
-
-    # ==========================================
-    # 实验一：训练最优模型，生成作业必需的 Loss/Acc 曲线图
-    # ==========================================
     print("\n" + "=" * 50)
-    print("🚀 实验一：训练最优模型 (固定 ReLU, 128隐藏层)")
+    print(" 实验一：训练最优模型 (固定 ReLU, 128隐藏层)")
     print("=" * 50)
 
     best_model = MLP(input=784, hidden=128, output=10,
@@ -96,17 +88,11 @@ if __name__ == '__main__':
 
     print("\n[注意] 正在弹出第一张图(Loss/Acc曲线)，请查看后【关闭窗口】，程序才会继续执行后续实验！")
     plot_history(best_history)
-
-    # ==========================================
-    # 实验二：基本要求 - 4种激活函数 (Activation) 对比
-    # ==========================================
     print("\n" + "=" * 50)
-    print("🚀 实验二：对比 4 种激活函数对性能的影响 (固定 128隐藏层)")
+    print(" 实验二：对比 4 种激活函数对性能的影响 (固定 128隐藏层)")
     print("=" * 50)
-
     activations_to_test = ['sigmoid', 'relu', 'leaky_relu', 'gelu']
     act_histories = {}
-
     for act in activations_to_test:
         print(f"\n---> 正在测试激活函数: {act.upper()}")
         test_model = MLP(input=784, hidden=128, output=10,
@@ -115,8 +101,6 @@ if __name__ == '__main__':
         history = train_model(test_model, X_train, y_train, X_val, y_val,
                               epochs=15, batch_size=64, learning_rate=0.1, lr_decay=0.95)
         act_histories[act] = history
-
-    # 画出激活函数对比图
     plt.figure(figsize=(10, 6))
     epochs_range = range(1, 16)
     styles = {
@@ -125,7 +109,6 @@ if __name__ == '__main__':
         'leaky_relu': {'color': 'green', 'marker': 's'},
         'gelu': {'color': 'red', 'marker': '*'}
     }
-
     for act in activations_to_test:
         plt.plot(epochs_range, act_histories[act]['val_acc'],
                  label=f'{act.upper()} Val Acc',
@@ -139,12 +122,8 @@ if __name__ == '__main__':
     plt.tight_layout()
     print("\n[注意] 正在弹出第二张图(激活函数对比)，请查看后【关闭窗口】，程序才会继续执行最后一步！")
     plt.show()
-
-    # ==========================================
-    # 实验三：加分项 - 隐藏层大小 (Hidden Dimension) 对比
-    # ==========================================
     print("\n" + "=" * 50)
-    print("🚀 实验三：对比不同隐藏层大小对性能的影响 (固定 ReLU)")
+    print(" 实验三：对比不同隐藏层大小对性能的影响 (固定 ReLU)")
     print("=" * 50)
 
     hidden_dims_to_test = [32, 64, 128, 256]
@@ -158,8 +137,6 @@ if __name__ == '__main__':
         history = train_model(test_model, X_train, y_train, X_val, y_val,
                               epochs=15, batch_size=64, learning_rate=0.1, lr_decay=0.95)
         dim_histories[h_dim] = history
-
-    # 画出隐藏层对比图
     plt.figure(figsize=(10, 6))
     colors = ['gray', 'blue', 'green', 'red']
     markers = ['v', 'o', 's', '*']
@@ -168,7 +145,6 @@ if __name__ == '__main__':
         plt.plot(epochs_range, dim_histories[h_dim]['val_acc'],
                  label=f'Hidden Dim: {h_dim}',
                  color=colors[i], marker=markers[i], linewidth=2)
-
     plt.title('Validation Accuracy Comparison (Different Hidden Dimensions)')
     plt.xlabel('Epochs')
     plt.ylabel('Validation Accuracy')
@@ -177,40 +153,26 @@ if __name__ == '__main__':
     plt.tight_layout()
     print("\n[注意] 正在弹出最后一张图(隐藏层对比)，查看后关闭即可。")
     plt.show()
-    # ==========================================
-    # 实验四：加分项 - L2 正则化强度 (L2 Regularization) 对比
-    # ==========================================
     print("\n" + "=" * 50)
-    print("🚀 实验四：对比不同 L2 正则化强度对性能的影响 (固定 ReLU, 128隐藏层)")
+    print(" 实验四：对比不同 L2 正则化强度对性能的影响 (固定 ReLU, 128隐藏层)")
     print("=" * 50)
-
-    # 我们测试 4 种强度：0.0(不加正则化), 0.001(轻度), 0.01(中度), 0.1(重度)
     l2_regs_to_test = [0.0, 0.001, 0.01, 0.1]
     reg_histories = {}
-
     for reg in l2_regs_to_test:
         print(f"\n---> 正在测试 L2 正则化强度: {reg}")
-        # 固定使用 relu 和 128，只改变 l2_reg
         test_model = MLP(input=784, hidden=128, output=10,
                          activation_type='relu', l2=reg)
-
-        # 同样跑 15 圈对比趋势
         history = train_model(test_model, X_train, y_train, X_val, y_val,
                               epochs=15, batch_size=64, learning_rate=0.1, lr_decay=0.95)
         reg_histories[reg] = history
-
-    # 画出正则化对比图
     plt.figure(figsize=(10, 6))
     colors = ['gray', 'blue', 'green', 'red']
     markers = ['v', 'o', 's', '*']
     epochs_range = range(1, 16)
-
     for i, reg in enumerate(l2_regs_to_test):
-        # 注意：画正则化图时，画 Validation Accuracy 最能说明问题
         plt.plot(epochs_range, reg_histories[reg]['val_acc'],
                  label=f'L2 Reg: {reg}',
                  color=colors[i], marker=markers[i], linewidth=2)
-
     plt.title('Validation Accuracy Comparison (Different L2 Regularization)')
     plt.xlabel('Epochs')
     plt.ylabel('Validation Accuracy')
@@ -220,34 +182,25 @@ if __name__ == '__main__':
     print("\n[注意] 正在弹出正则化对比图，查看后关闭即可。")
     plt.show()
     print("\n" + "=" * 50)
-    print("🚀 实验五：对比不同初始学习率对性能的影响 (固定 ReLU, 128隐藏层)")
+    print(" 实验五：对比不同初始学习率对性能的影响 (固定 ReLU, 128隐藏层)")
     print("=" * 50)
-
-    # 我们测试 4 种学习率：0.01(太慢), 0.05(适中), 0.1(最优), 0.5(太大)
     lrs_to_test = [0.01, 0.05, 0.1, 0.5]
     lr_histories = {}
-
     for lr in lrs_to_test:
         print(f"\n---> 正在测试初始学习率: {lr}")
         test_model = MLP(input=784, hidden=128, output=10,
                          activation_type='relu', l2=0.001)
-
-        # 注意：这里的 learning_rate 换成了循环里的 lr
         history = train_model(test_model, X_train, y_train, X_val, y_val,
                               epochs=15, batch_size=64, learning_rate=lr, lr_decay=0.95)
         lr_histories[lr] = history
-
-    # 画出学习率对比图
     plt.figure(figsize=(10, 6))
     colors = ['gray', 'blue', 'green', 'red']
     markers = ['v', 'o', 's', '*']
     epochs_range = range(1, 16)
-
     for i, lr in enumerate(lrs_to_test):
         plt.plot(epochs_range, lr_histories[lr]['val_acc'],
                  label=f'Learning Rate: {lr}',
                  color=colors[i], marker=markers[i], linewidth=2)
-
     plt.title('Validation Accuracy Comparison (Different Learning Rates)')
     plt.xlabel('Epochs')
     plt.ylabel('Validation Accuracy')
@@ -256,5 +209,3 @@ if __name__ == '__main__':
     plt.tight_layout()
     plt.show()
 
-    print("\n🎉 所有超参数查找实验大满贯完成！！")
-    print("\n🎉 所有实验运行完毕！三张王牌图表已全部保存在项目文件夹中！")
